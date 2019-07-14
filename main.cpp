@@ -2,6 +2,43 @@
 int main() {
 
 	menu();
+	//LIST l;
+	//NHANVIEN nv;
+	//ifstream filein;
+	//KhoiTaoDanhSach(l);
+	//string tukhoa;
+	//
+	//filein.open("NHANVIEN.txt", ios::in);
+	//DocDanhSachNhanVien(filein, l);
+	//XuatDanhSachNhanVien(l);
+	//cout << "nhap tu khoa: ";
+	//getline(cin, tukhoa);
+
+	//test(l,tukhoa);
+	/*string s1 = "van hoang";
+	string s2 = "thanh ba";
+	if (TachTen(s1) < TachTen(s2)) {
+		cout << "1";
+	}
+	else
+	{
+		cout << "0";
+	}*/
+	
+	/*string s1 = "Nhan vien";
+	cout << s1 << endl;
+	string s2;
+	cout << "Nhap vao chuoi s2: ";
+	getline(cin, s2);
+	cout << s2<< endl;
+	if (UpperToLower(s1) == UpperToLower(s2)) {
+		cout<<"bang nhau";
+	}
+	else
+	{
+		cout<<"khong bang";
+	}*/
+
 	/*const char* s = "hoa thoi";
 	int l = s.length();
 	char *n=subString(s ,4,l);
