@@ -38,20 +38,19 @@ void ThemCuoi(LIST &l, NODE *p) {
 }
 
 void DocDate(ifstream &filein, DATE &date) {
-	filein >> date.ngay;
-	filein.seekg(1, 1);
-	filein >> date.thang;
-	filein.seekg(1, 1);
-	filein >> date.nam;
+	getline(filein , date.ngay,'/');
+	getline(filein, date.thang, '/');
+	getline(filein, date.nam,',');
 }
 
 void DocThongTin1NhanVien(ifstream &filein, NHANVIEN &nv) {
+	
 	getline(filein, nv.hoten, ',');
 	filein.seekg(1, 1);
 	getline(filein, nv.chucvu, ',');
 	filein.seekg(1, 1);
 	DocDate(filein, nv.ngaysinh);
-	filein.seekg(2, 1);
+	filein.seekg(1, 1);
 	filein >> nv.hsl;
 	//Đọc kĩ tự xuống dòng
 	string temp;
@@ -78,7 +77,7 @@ void LuuThongTin1NhanVien(ofstream &fileout, NHANVIEN nv) {
 void Xuat(NHANVIEN nv) {
 		cout << left << setw(22) << nv.hoten << "\t";
 		cout << left << setw(18) << nv.chucvu << "\t";
-		cout << right<<  setw(2)<< nv.ngaysinh.ngay << "/"<< right<< setw(2) << nv.ngaysinh.thang <<  "/" << setw(4)<< nv.ngaysinh.nam << "\t";
+		cout << right<<  setw(2)<< nv.ngaysinh.ngay << "/"<< right<< setw(2) << nv.ngaysinh.thang <<  "/" << setw(4)<< nv.ngaysinh.nam << "\t   ";
 		cout << left << setw(11) << nv.hsl << "\t";
 		cout << endl;
 	/*cout << "\n Ho Ten: " << nv.hoten;
@@ -88,11 +87,11 @@ void Xuat(NHANVIEN nv) {
 }
 void XuatDanhSachNhanVien(LIST l) {
 	int dem = 1;
-	cout << left << setw(20) << "\n\t\t\t\t   Ho Ten \t" << left << setw(13) << "\tChuc Vu" << "\t" << left << setw(10) << "\tNgay Sinh " << "\t" << left << setw(13) << "He So Luong" << "\t";
+	cout << "\n\t\tSTT"<<left << setw(20) << "\t   Ho Ten \t" << left << setw(13) << "  Chuc Vu" << "\t" << left << setw(10) << "\tNgay Sinh " << "\t" << left << setw(13) << "He So Luong" << "\t\n";
 
 	for (NODE *k = l.pHead; k != NULL; k = k->pNext)
 	{
-		cout << "\n\n\t NHAN VIEN THU  " << dem++<<"\t";
+		cout  <<"\t\t"<< dem++<<"\t";
 		
 		Xuat(k->data);
 	}
@@ -147,7 +146,7 @@ int StrToInt(string str) {
 }
 float StrToFloat(string str) {
 	int vitridaucham = 0;
-	float ketqua = 0.0;
+	float ketqua = 0.0f;
 	int length = str.length();
 	for (int i = 0; i < length; i++) {
 		if (str[i] == '.') {
@@ -188,14 +187,14 @@ bool isFloat(string s) {
 }
 
 bool SoSanhDate(date &date1, date &date2) {
-	if (date1.nam > date2.nam) return true;
-	else if (date1.nam == date2.nam)
+	if (StrToInt(date1.nam )> StrToInt(date2.nam)) return true;
+	else if(StrToInt( date1.nam) == StrToInt(date2.nam))
 	{
-		if (date1.thang > date2.thang) {
+		if (StrToInt(date1.thang) > StrToInt(date2.thang)) {
 			return true;
 		}
-		else if (date1.thang == date2.thang) {
-			if (date1.ngay > date2.ngay) {
+		else if (StrToInt(date1.thang) == StrToInt(date2.thang)) {
+			if (StrToInt(date1.ngay) > StrToInt(date2.ngay)) {
 				return true;
 			}
 			return false;
@@ -244,9 +243,9 @@ string TachTen(string ten) {
 	return LayTen(ten, ViTri(ten), LengthStr(ten));
 }
 //Hàm Compare trả về 1
-int TraVeChucVu(string s) {
+int SoSanhChucVu(string s) {
 
-	string  s1 = "Nhan vien", s2 = "Quan li", s3 = "Giam doc", s4 = "Tong giam doc",s5="Thu ky";
+	string  s1 = "Nhan vien", s2 = "Quan li", s4 = "Giam doc", s5 = "Tong giam doc",s3="Thu ky";
 	if (CompareStr(UpperToLower(s), UpperToLower(s1))) {
 		return  1;
 	}
@@ -259,16 +258,111 @@ int TraVeChucVu(string s) {
 	else if (CompareStr(UpperToLower(s), UpperToLower(s4))) {
 		return 4;
 	}
-	else if (CompareStr(UpperToLower(s), UpperToLower(s4))) {
+	else if (CompareStr(UpperToLower(s), UpperToLower(s5))) {
 		return 5;
 	}
 	else {
 		return 0;
 	}
 }
-
+int SoSanhTen(string s1,string s2) {
+	if(UpperToLower(s1) > UpperToLower(s2)){
+		return true;
+	}
+	return false;
+}
 //KẾT THÚC BIẾN ĐỔI THÊM
+//mới thêm
+void ThemNhanVien(LIST &l, int status)
+{
+	NHANVIEN nv;
+	Nhap(nv);
+	NODE *p = KhoiTaoNode(nv);
+	NODE *q = NULL;
+	if (status == 0) {
+		ThemCuoi(l, p);
+	}
+	else if (status == 1) {
+		if (!SoSanhDate(p->data.ngaysinh, l.pHead->data.ngaysinh)) {
+			ThemDau(l, p);
+		}
+		else if (SoSanhDate(p->data.ngaysinh, l.pTail->data.ngaysinh)) {
+			ThemCuoi(l, p);
+		}
+		else {
+			for (NODE *k = l.pHead; k != NULL; k = k->pNext)
+			{
 
+				if (!SoSanhDate(k->data.ngaysinh, p->data.ngaysinh) && SoSanhDate(k->pNext->data.ngaysinh, p->data.ngaysinh)) {
+					q = k;
+					p->pNext = q->pNext;
+					q->pNext = p;
+					break;
+				}
+
+			}
+		}
+	}
+	else if (status == 2) {
+		if (SoSanhChucVu(p->data.chucvu) > SoSanhChucVu(l.pHead->data.chucvu)) {
+			ThemDau(l, p);
+		}
+		else if (SoSanhChucVu(p->data.chucvu) < SoSanhChucVu(l.pTail->data.chucvu)) {
+			ThemCuoi(l, p);
+		}
+		else {
+			for (NODE *k = l.pHead; k != NULL; k = k->pNext)
+			{
+				if (SoSanhChucVu(k->data.chucvu) <= SoSanhChucVu(p->data.chucvu)) {
+					q = k;
+					p->pNext = q->pNext;
+					q->pNext = p;
+					break;
+				}
+			}
+		}
+	}
+	else if (status == 3) {
+		if (p->data.hsl < l.pHead->data.hsl) {
+			ThemDau(l, p);
+		}
+		else if (p->data.hsl > l.pTail->data.hsl) {
+			ThemCuoi(l, p);
+		}
+		else {
+			for (NODE *k = l.pHead; k != NULL; k = k->pNext)
+			{
+				if (k->data.hsl >= p->data.hsl) {
+					q = k;
+					p->pNext = q->pNext;
+					q->pNext = p;
+					break;
+				}
+			}
+		}
+	}
+	else if (status == 4) {
+		if (UpperToLower( TachTen(p->data.hoten))< UpperToLower(TachTen(l.pHead->data.hoten))) {
+			ThemDau(l, p);
+		}
+		else if (UpperToLower(TachTen(p->data.hoten))> UpperToLower(TachTen(l.pTail->data.hoten))) {
+			ThemCuoi(l, p);
+		}
+		else
+		{
+			for (NODE *k = l.pHead; k != NULL; k = k->pNext)
+			{
+				if (UpperToLower(TachTen(k->data.hoten))< UpperToLower(TachTen(p->data.hoten)) && SoSanhTen(UpperToLower(TachTen(k->pNext->data.hoten)) , (UpperToLower(TachTen(p->data.hoten))))) {
+					q = k;
+					p->pNext = q->pNext;
+					q->pNext = p;
+					break;
+				}
+			}
+		}
+	}
+	
+}
 void HoanViNode(NHANVIEN &x, NHANVIEN &y) {
 	NHANVIEN tam = x;
 	x = y;
@@ -287,6 +381,18 @@ void SapXepTheoNgay(LIST &l) {
 		}
 	}
 }
+void SapXepTheoTen(LIST &l) {
+	for (NODE *k = l.pHead; k != NULL; k = k->pNext)
+	{
+		for (NODE *h = k->pNext; h != NULL; h = h->pNext) {
+			if (SoSanhTen(TachTen(k->data.hoten),TachTen( h->data.hoten)))
+			{
+				HoanViNode(k->data, h->data);
+			}
+
+		}
+	}
+}
 //so sanh theo chức vụ tăng dần
 void SapXepTheoChucVu(LIST &l) {
 	int dem = 1;	int tam = 1;
@@ -295,7 +401,7 @@ void SapXepTheoChucVu(LIST &l) {
 		//cout << "So tra ve k lan "<< dem++ <<": "<< TraVeChucVu(k->data.chucvu) << endl;
 		for (NODE *h = k->pNext; h != NULL; h = h->pNext) {
 			//cout << "So tra ve h lan " << tam++ << ": " << TraVeChucVu(h->data.chucvu) << endl;
-			if (TraVeChucVu(k->data.chucvu) < TraVeChucVu(h->data.chucvu))
+			if (SoSanhChucVu(k->data.chucvu) < SoSanhChucVu(h->data.chucvu))
 			{
 				HoanViNode(k->data, h->data);
 			}
@@ -316,39 +422,102 @@ void SapXepTheoHSL(LIST &l) {
 	}
 }
 //chèn nhân viên
+bool NamNhuan(int Year) {
+	if ((Year % 4 == 0 && Year % 100 != 0) || Year % 400 == 0) {
+		return true;
+	}
+	return false;
+}
+int SoNgayTrongThang(int day,int Month,int Year) {
+	int soNgay;
+	switch (Month)
+	{
+	case 1:
+	case 3:
+	case 5:
+	case 7:
+	case 8:
+	case 10:
+	case 12:
+		soNgay = 31;
+		break;
+	case 4:
+	case 6:
+	case 9:
+	case 11:
+		soNgay = 30;
+		break;
+	case 2:
+		if (NamNhuan(Year)) {
+			soNgay = 29;
+		}
+		else
+		{
+			soNgay = 28;
+		}
+	default:
+		break;
+	}
+	return soNgay;
+}
+//void Test() {
+//	int year;
+//	cout << "Nhap nam";
+//	cin >> year;
+//	if (NamNhuan(year)) {
+//		cout << "la nam nhuan" << endl;
+//	}
+//	else
+//	{
+//		cout << "khong";
+//	}
+//	
+//}
+
+//đưa ngay thang nam trong struct và string hết rồi để chuyển đổi thanh int so sánh.
 void Nhap(NHANVIEN &nv)
 {
-	cin.ignore(); // thêm vào để xoá bộ nhớ đệm, tránh bị trôi lệnh
-	cout << "Nhap ho ten nhan vien: ";
-	getline(cin, nv.hoten);
-	fflush(stdin);
-	cout << "Nhap chuc vu: ";
-	getline(cin, nv.chucvu);
-	fflush(stdin);
-	cout << "\n NHAP NGAY THANG NAM SINH ";
+	string  s1 = "Nhan vien", s2 = "Quan li", s3 = "Giam doc", s4 = "Tong giam doc", s5 = "Thu ky";
 	do {
-		cout << "\nNhap ngay sinh: ";
-		cin >> nv.ngaysinh.ngay;
+		cout << "Nhap ho ten nhan vien: ";
+		getline(cin, nv.hoten);
 		fflush(stdin);
-	} while (nv.ngaysinh.ngay > 31 || nv.ngaysinh.ngay < 1);
+	} while (CheckInterger(nv.hoten));
+	
 	do {
-		cout << "Nhap thang sinh: ";
-		cin >> nv.ngaysinh.thang;
+		cout << "Vui long nhap 1 trong 5 CVU: Giam doc , Tong giam doc , Quan li , Thu ky , Nhan vien.\n";
+		cout << "Nhap chuc vu: ";
+		getline(cin, nv.chucvu);
 		fflush(stdin);
-	} while (nv.ngaysinh.thang > 12 || nv.ngaysinh.thang < 1);
+		//Bị nhầm dấu || và dấu && chú ý :))
+	} while (UpperToLower( nv.chucvu) != UpperToLower(s1) && UpperToLower(nv.chucvu) != UpperToLower(s2) && UpperToLower(nv.chucvu) != UpperToLower(s3) && UpperToLower(nv.chucvu) != UpperToLower(s4) && UpperToLower(nv.chucvu) != UpperToLower(s5));
+	cout << "\n *** NHAP NGAY THANG NAM SINH ***" << endl;;
 	do {
 		cout << "Nhap nam sinh: ";
-		cin >> nv.ngaysinh.nam;
+		
+		 getline(cin, nv.ngaysinh.nam);
 		fflush(stdin);
-	} while (nv.ngaysinh.nam > 2004 || nv.ngaysinh.nam < 1930);
-	cout << "Nhap he so luong: ";
-	cin >> nv.hsl;
-
+	} while (StrToInt(nv.ngaysinh.nam) > 2004 || StrToInt(nv.ngaysinh.nam) < 1930);
+	do {
+		cout << "Nhap thang sinh: ";
+		getline(cin, nv.ngaysinh.thang);
+		fflush(stdin);
+	} while (StrToInt(nv.ngaysinh.thang) > 12 || StrToInt(nv.ngaysinh.thang) < 1);
+	do {
+		cout << "Nhap ngay sinh: ";
+		getline(cin, nv.ngaysinh.ngay);
+		fflush(stdin);
+	} while (StrToInt(nv.ngaysinh.ngay) > SoNgayTrongThang(StrToInt(nv.ngaysinh.ngay), StrToInt(nv.ngaysinh.thang), StrToInt(nv.ngaysinh.nam)) || StrToInt(nv.ngaysinh.ngay) < 1);
+	do {
+		cout << "Nhap he so luong: ";
+		getline(cin, nv.hsl);
+		StrToFloat(nv.hsl);
+	} while (!isFloat(nv.hsl));
 }
 
 void KhoiTaoNhanVien(LIST &l) {
 	NHANVIEN nv;
-	cout << "NHAP THONG TIN NHAN VIEN CAN THEM \n";
+	cout << "NHAP THONG TIN NHAN VIEN CAN THEM (nhan Enter de them)"<<endl;
 	Nhap(nv);
 	NODE *p = KhoiTaoNode(nv);
 	ThemCuoi(l, p);
@@ -382,6 +551,7 @@ void XoaCuoi(LIST &l) {
 		}
 	}
 }
+//Xoa theo pointer-to-pointer
 
 //CÁC  HÀM XÓA
 //void XoaTheoNam(LIST &l, string x) {
@@ -416,90 +586,93 @@ void XoaCuoi(LIST &l) {
 //		cout << "Da xoa thanh cong nhan vien co nam:  " << x << endl;
 //	}
 //}
-void XoaTheoNam(LIST &l,string key)
-{
-	if (l.pHead == NULL) {
-		cout << "Danh sach rong khong the xoa nua ! ";
-		return;
-	}
-	int namoi = StrToInt(key);
-	 NODE **pp = &l.pHead;
-	 int dem = 0;
-	while (*pp) {
-		NODE *thimang = *pp;
-		if (thimang->data.ngaysinh.nam == namoi) {
-			*pp = thimang->pNext;
-			delete (thimang);
-			cout << "Da xoa thanh cong lan "<<++dem<<" thong tin ve nam : " << namoi << endl;
-		}
-		else
-			pp = &(thimang->pNext);
-		
-	}
-}
-void XoaTheoHSL(LIST &l, string hsl)
-{
-	if (l.pHead == NULL) {
-		cout << "Danh sach rong khong the xoa nua ! ";
-		return;
-	}
-	float hslmoi = StrToFloat(hsl);
-	NODE **pp = &l.pHead;
-	int dem = 0;
-	while (*pp) {
-		NODE *thimang = *pp;
-		if (thimang->data.hsl == hslmoi) {
-			*pp = thimang->pNext;
-			delete (thimang);
-			cout << "Da xoa thanh cong lan " << ++dem << " thong tin ve he so luong : " << hslmoi << endl;
-		}
-		else
-			pp = &(thimang->pNext);
 
-	}
-}
-void XoaTheoTen(LIST &l, string ten)
-{
-	if (l.pHead == NULL) {
-		cout << "Danh sach rong khong the xoa nua ! ";
-		return;
-	}
-	NODE **pp = &l.pHead;
-	int dem = 0;
-	while (*pp) {
-		NODE *thimang = *pp;
-		string tentach = TachTen(thimang->data.hoten);
-		if (CompareStr(UpperToLower(tentach), UpperToLower(ten))==1) {
-			*pp = thimang->pNext;
-			delete thimang;
-			cout << "Da xoa thanh cong lan " << ++dem << " thong tin ve he so luong : " << ten << endl;
-		}
-		else
-			pp = &(thimang->pNext);
+//void XoaTheoNam(LIST &l,string key)
+//{
+//	if (l.pHead == NULL) {
+//		cout << "Danh sach rong khong the xoa nua ! ";
+//		return;
+//	}
+//	int namoi = StrToInt(key);
+//	 NODE **pp = &l.pHead;
+//	 int dem = 0;
+//	while (*pp) {
+//		NODE *thimang = *pp;
+//		if (thimang->data.ngaysinh.nam == namoi) {
+//			*pp = thimang->pNext;
+//			delete (thimang);
+//			cout << "Da xoa thanh cong lan "<<++dem<<" thong tin ve nam : " << namoi << endl;
+//		}
+//		else
+//			pp = &(thimang->pNext);
+//		
+//	}
+//}
 
-	}
-}
-void XoaTheoChucVu(LIST &l, string cv)
-{
-	if (l.pHead == NULL) {
-		cout << "Danh sach rong khong the xoa nua ! ";
-		return;
-	}
-	NODE **pp = &l.pHead;
-	int dem = 0;
-	while (*pp) {
-		NODE *thimang = *pp;
-		string cvmoi = thimang->data.chucvu;
-		if (CompareStr(UpperToLower(cvmoi), UpperToLower(cv))) {
-			*pp = thimang->pNext;
-			delete thimang;
-			cout << "Da xoa thanh cong lan " << ++dem << " thong tin ve chuc vu : " << cv << endl;
-		}
-		else
-			pp = &(thimang->pNext);
+//void XoaTheoHSL(LIST &l, string hsl)
+//{
+//	if (l.pHead == NULL) {
+//		cout << "Danh sach rong khong the xoa nua ! ";
+//		return;
+//	}
+//	float hslmoi = StrToFloat(hsl);
+//	NODE **pp = &l.pHead;
+//	int dem = 0;
+//	while (*pp) {
+//		NODE *thimang = *pp;
+//		if (thimang->data.hsl == hslmoi) {
+//			*pp = thimang->pNext;
+//			delete (thimang);
+//			cout << "Da xoa thanh cong lan " << ++dem << " thong tin ve he so luong : " << hslmoi << endl;
+//		}
+//		else
+//			pp = &(thimang->pNext);
+//
+//	}
+//}
 
-	}
-}
+//void XoaTheoTen(LIST &l, string ten)
+//{
+//	if (l.pHead == NULL) {
+//		cout << "Danh sach rong khong the xoa nua ! ";
+//		return;
+//	}
+//	NODE **pp = &l.pHead;
+//	int dem = 0;
+//	while (*pp) {
+//		NODE *thimang = *pp;
+//		string tentach = TachTen(thimang->data.hoten);
+//		if (CompareStr(UpperToLower(tentach), UpperToLower(ten))==1) {
+//			*pp = thimang->pNext;
+//			delete thimang;
+//			cout << "Da xoa thanh cong lan " << ++dem << " thong tin ve he so luong : " << ten << endl;
+//		}
+//		else
+//			pp = &(thimang->pNext);
+//
+//	}
+//}
+//void XoaTheoChucVu(LIST &l, string cv)
+//{
+//	if (l.pHead == NULL) {
+//		cout << "Danh sach rong khong the xoa nua ! ";
+//		return;
+//	}
+//	NODE **pp = &l.pHead;
+//	int dem = 0;
+//	while (*pp) {
+//		NODE *thimang = *pp;
+//		string cvmoi = thimang->data.chucvu;
+//		if (CompareStr(UpperToLower(cvmoi), UpperToLower(cv))) {
+//			*pp = thimang->pNext;
+//			delete thimang;
+//			cout << "Da xoa thanh cong lan " << ++dem << " thong tin ve chuc vu : " << cv << endl;
+//		}
+//		else
+//			pp = &(thimang->pNext);
+//
+//	}
+//}
 //void XoaTheoHSL(LIST &l, string x) {
 //	if (l.pHead == NULL) {
 //		cout << "Danh sach rong khong the xoa nua ! ";
@@ -600,23 +773,160 @@ void XoaTheoChucVu(LIST &l, string cv)
 //	}
 //
 //}
+
+//Xoa theo pointer
+//Bị lỗi xóa vẫn còn phần tử cuối mất NULL - đã sửa
+void XoaTheoNam(LIST &l,string key)
+{
+	int dem = 0;
+	int moi = StrToInt(key);
+	while (l.pHead && StrToInt(l.pHead->data.ngaysinh.nam) == moi)
+	{
+		node * tmp = l.pHead;
+		l.pHead = l.pHead->pNext;
+		delete tmp;
+		cout << "Da xoa thong tin cua nhan vien thu  " << ++dem << " theo nam " << key <<endl;
+	}
+	
+	for (node * k = l.pHead; k != NULL; k = k->pNext)
+	{
+		while (k->pNext != NULL && StrToInt(k->pNext->data.ngaysinh.nam) == moi)
+		{
+			if (k->pNext==l.pTail) {
+				delete l.pTail;
+				k->pNext = NULL;
+				l.pTail = k;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo nam " << key << endl;
+			}
+			else {
+				node * tmp = k->pNext;
+				k->pNext = tmp->pNext;
+				delete tmp;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo nam " << key << endl;
+			}
+		}
+	}
+}
+//void test(LIST &l, string key) {
+//	if (StrToFloat(l.pHead->data.hsl) == StrToFloat(key)) {
+//		cout << "bang nhau";
+//	}
+//	else
+//	{
+//		cout << "khong bang nhau";
+//	}
+//}
+void XoaTheoHSL(LIST &l, string key)
+{
+	int dem = 0;
+	while (l.pHead && StrToFloat(l.pHead->data.hsl) == StrToFloat(key))
+	{
+		node * tmp = l.pHead;
+		l.pHead = l.pHead->pNext;
+		delete tmp;
+		cout << "Da xoa thong tin cua nhan vien thu  " << ++dem << " theo he so luong " << key << endl;
+	}
+
+	for (node * k = l.pHead; k != NULL; k = k->pNext)
+	{
+		while (k->pNext != NULL && StrToFloat(k->pNext->data.hsl) == StrToFloat(key))
+		{
+			if (k->pNext == l.pTail) {
+				delete l.pTail;
+				k->pNext = NULL;
+				l.pTail = k;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " he so luong " << key << endl;
+			}
+			else {
+				node * tmp = k->pNext;
+				k->pNext = tmp->pNext;
+				delete tmp;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo he so luong " << key << endl;
+			}
+		}
+	}
+}
+void XoaTheoTen(LIST &l, string key)
+{
+	int dem = 0;
+	while (l.pHead && CompareStr(UpperToLower(TachTen( l.pHead->data.hoten)), UpperToLower(key))==1)
+	{
+		node * tmp = l.pHead;
+		l.pHead = l.pHead->pNext;
+		delete tmp;
+		cout << "Da xoa thong tin cua nhan vien thu  " << ++dem << " theo  ten: " << key << endl;
+	}
+
+	for (node * k = l.pHead; k != NULL; k = k->pNext)
+	{
+		while (k->pNext != NULL && CompareStr(UpperToLower(TachTen(k->pNext->data.hoten)), UpperToLower(key)) == 1)
+		{
+			if (k->pNext == l.pTail) {
+				delete l.pTail;
+				k->pNext = NULL;
+				l.pTail = k;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo ten: " << key << endl;
+			}
+			else {
+				node * tmp = k->pNext;
+				k->pNext = tmp->pNext;
+				delete tmp;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo ten: " << key << endl;
+			}
+		}
+	}
+}
+void XoaTheoChucVu(LIST &l, string key)
+{
+	int dem = 0;
+	while (l.pHead && CompareStr(UpperToLower(l.pHead->data.chucvu), UpperToLower(key)) == 1)
+	{
+		node * tmp = l.pHead;
+		l.pHead = l.pHead->pNext;
+		delete tmp;
+		cout << "Da xoa thong tin cua nhan vien thu  " << ++dem << " theo chuc vu: " << key << endl;
+	}
+
+	for (node * k = l.pHead; k != NULL; k = k->pNext)
+	{
+		while (k->pNext != NULL && CompareStr(UpperToLower(k->pNext->data.chucvu), UpperToLower(key)) == 1)
+		{
+			if (k->pNext == l.pTail) {
+				delete l.pTail;
+				k->pNext = NULL;
+				l.pTail = k;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo nam " << key << endl;
+			}
+			else {
+				node * tmp = k->pNext;
+				k->pNext = tmp->pNext;
+				delete tmp;
+				cout << "Da xoa thong tin cua nhan vien thu " << ++dem << " theo chuc vu: " << key << endl;
+			}
+		}
+	}
+}
 void XoaNhanVien(LIST &l) {
-	cin.ignore();
 	string tukhoa;
 	cout << "Nhap du lieu muon xoa: ";
 	getline(cin, tukhoa);
-	if (CheckInterger(tukhoa)) {
-		XoaTheoNam(l, tukhoa);
+	if (l.pHead == NULL) {
+		cout << "Danh sach rong khong the xoa nua ! \n";
+		return;
 	}
 	else if (isFloat(tukhoa))
 	{
 		XoaTheoHSL(l, tukhoa);
+		if (CheckInterger(tukhoa)) {
+			XoaTheoNam(l, tukhoa);
+		}
 	}
 	else {
 		XoaTheoTen(l, tukhoa);
 		XoaTheoChucVu(l, tukhoa);
 	}
-	cout << "Khong tim thay du lieu "<<tukhoa<<" muon xoa";
+	cout << "\nKhong con thong tin nhan vien muon xoa. ";
+	cout << "Vui long kiem tra danh sach.\n";
 }
 
 //CÁC HÀM TÌM KIẾM
@@ -645,15 +955,13 @@ void TimKiemNhanVienTheoChucVu(LIST l, string cv) {
 
 }
 void TimKiemNhanVienTheoHSL(LIST l, string hsl) {
-
 	float namoi = StrToFloat(hsl);
 	int dem = 0;
 	for (NODE *k = l.pHead; k != NULL; k = k->pNext) {
-		if (k->data.hsl == namoi) {
+		if (StrToFloat(k->data.hsl) == namoi) {
 			Xuat(k->data);
 			cout << endl;
 			dem = 1;
-
 		}
 	}
 	if (dem == 0) {
@@ -665,7 +973,7 @@ void TimKiemNhanVienTheoNam(LIST l, string nam) {
 	int namoi = StrToInt(nam);
 	int dem = 0;
 	for (NODE *k = l.pHead; k != NULL; k = k->pNext) {
-		int namsan = k->data.ngaysinh.nam;
+		int namsan = StrToInt(k->data.ngaysinh.nam);
 		if (namsan == namoi) {//chuyển thành int
 			Xuat(k->data);
 			cout << endl;
@@ -679,13 +987,15 @@ void TimKiemNhanVienTheoNam(LIST l, string nam) {
 	}
 }
 void TimKiemNhanVien(LIST l) {
-	cin.ignore();
 	string tukhoa;
-	cout << "\n\nNhap tu khoa can tim ve nhan vien: ";
+	cout << "Nhap tu khoa can tim ve nhan vien: ";
+	
 	getline(cin, tukhoa);
-	cout << endl << endl;
-
-	if (CheckInterger(tukhoa) && StrToInt(tukhoa) > 1900) {
+	if (l.pHead == NULL) {
+		cout << "Danh sach rong khong the xoa nua tim ! \n";
+		return;
+	}
+	else if (CheckInterger(tukhoa) && StrToInt(tukhoa) > 1900) {
 		TimKiemNhanVienTheoNam(l, tukhoa);
 
 	}
@@ -766,6 +1076,7 @@ void menu() {
 	NHANVIEN nv;
 	LIST l;
 	KhoiTaoDanhSach(l);
+	int luuluachon = 0;
 	while (true)
 	{
 	menu:
@@ -778,16 +1089,18 @@ void menu() {
 		cout << "\n\t\t\t*\t\t4. Xoa nhan vien \t\t\t *";
 		cout << "\n\t\t\t*\t\t5. Tim kiem nhan vien \t\t\t *";
 		cout << "\n\t\t\t*\t\t6. Xem danh sach nhan vien \t\t *";
-		cout << "\n\t\t\t*\t\t7. Xuat ds nhan vien ra TEXT \t\t *";
+		cout << "\n\t\t\t*\t\t7. Xuat ds nhan vien ra file TEXT \t *";
 		cout << "\n\t\t\t*\t\t0. TRO VE MENU  \t\t\t *";
 		cout << "\n\t\t\t*\t\t\t\t\t\t\t *";
 		cout << "\n\t\t\t************************** END ***************************";
 		while (true)
 		{
-			cout << "\n\nNhap lua chon (so nguyen): ";
-			int luachon;
-			cin >> luachon;
 			
+			string luachon1;
+			cout << "\n\nNhap lua chon (so nguyen): ";
+			getline(cin, luachon1);
+			
+			int luachon = StrToInt(luachon1);
 			switch (luachon)
 			{
 			case 1:
@@ -807,15 +1120,18 @@ void menu() {
 					cout << "\n\t\t\t*\t\t\t\t\t\t\t *";
 					cout << "\n\t\t\t*\t\t1. Ngay thang nam sinh \t\t\t *";
 					cout << "\n\t\t\t*\t\t2. Theo chuc vu \t\t\t *";
+
 					cout << "\n\t\t\t*\t\t3. Theo he so luong \t\t\t *";
+					cout << "\n\t\t\t*\t\t4. Theo ho ten \t\t\t *";
 					cout << "\n\t\t\t*\t\t0. Tro ve menu \t\t\t\t *";
 					cout << "\n\t\t\t*\t\t\t\t\t\t\t *";
 					cout << "\n\t\t\t************************** END ***************************";
 					cout << endl;
 					while (true) {
-						int luachon;
+						string luachon1;
 						cout << "Nhap lua chon: ";
-						cin >> luachon;
+						getline(cin, luachon1);
+						int luachon = StrToInt(luachon1);
 						cout << endl;
 						switch (luachon)
 						{
@@ -825,6 +1141,7 @@ void menu() {
 						}
 						case 1:
 						{
+							luuluachon = luachon;
 							if (l.pHead == NULL) {
 								cout << "Danh sach dang rong. Vui long them hoac doc file! \n\n";
 							}
@@ -839,6 +1156,7 @@ void menu() {
 						//Cần sắp xếp lại chức vụ
 						case 2:
 						{
+							luuluachon = luachon;
 							SapXepTheoChucVu(l);
 							if (l.pHead == NULL) {
 								cout << "Danh sach dang rong. Vui long them hoac doc file! \n\n";
@@ -852,11 +1170,25 @@ void menu() {
 						}
 						case 3:
 						{
+							luuluachon = luachon;
 							if (l.pHead == NULL) {
 								cout << "Danh sach dang rong. Vui long them hoac doc file! \n\n";
 							}
 							SapXepTheoHSL(l);
 							cout << "\t\t\t\t| DANH SACH SAU KHI SAP XEP THEO HE SO LUONG | \n\n";
+							XuatDanhSachNhanVien(l);
+							cout << endl;
+							system("pause");
+							goto menu;
+							break;
+						}
+						case 4: {
+							luuluachon = luachon;
+							if (l.pHead == NULL) {
+								cout << "Danh sach dang rong. Vui long them hoac doc file! \n\n";
+							}
+							SapXepTheoTen(l);
+							cout << "\t\t\t\t| DANH SACH SAU KHI SAP XEP THEO TEN | \n\n";
 							XuatDanhSachNhanVien(l);
 							cout << endl;
 							system("pause");
@@ -875,74 +1207,18 @@ void menu() {
 			}
 			case 3:
 			{
-				system("cls");
-				while (true)
-				{
-					cout << "\n\n\t\t\t*********************** CHEN THEO TIEU CHI ***********************";
-					cout << "\n\t\t\t*\t\t\t\t\t\t\t\t *";
-					cout << "\n\t                *                  1. Theo Ngay thang nam sinh \t\t\t *";
-					cout << "\n\t                *                  2. Theo chuc vu \t\t\t\t *";
-					cout << "\n\t                *                  3. Theo he so luong \t\t\t\t *";
-					cout << "\n\t                *                  0. Quay ve \t\t\t\t\t *";
-					cout << "\n\t\t\t*\t\t\t\t\t\t\t\t *\n\t\t\t*\t\t************ End ************\t\t\t *";
-					while (true)
-					{
-						cout << "\nNhap lua chon: ";
-						int luachon;
-						cin >> luachon;
+				cout << "\n\n\t\t\t*********************** CHEN NHAN VIEN ***********************\n";
 
-						switch (luachon)
-						{
-						case 0:
-						{
-							goto menu;
-						}
-						case 1:
-						{
-							KhoiTaoNhanVien(l);
-							cout << "\n\n\t\t\t\t\t=========== Da them thanh cong =========== ";
-							SapXepTheoNgay(l);
-							cout << "\n\n\t\t=========== Danh sach nhan vien sau  khi sap xep theo ngay thang nam sinh ===========";
-							XuatDanhSachNhanVien(l);
-							cout << "\n";
-							system("pause");
-							goto menu;
-							break;
-						}
-						case 2:
-						{
-							KhoiTaoNhanVien(l);
-							cout << "\n\n\t\t\t\t\t=========== Da them thanh cong =========== ";
-							SapXepTheoChucVu(l);
-							cout << "\n\n\t\t=========== Danh sach nhan vien sau  khi sap xep theo chuc vu ===========";
-							XuatDanhSachNhanVien(l); cout << "\n";
-							system("pause");
-							goto menu;
-							break;
-						}
-						case 3:
-						{
-							KhoiTaoNhanVien(l);
-							cout << "\n\n\t\t\t\t\t=========== Da them thanh cong =========== ";
-							SapXepTheoHSL(l);
-							cout << "\n\n\t\t=========== Danh sach nhan vien sau  khi sap xep theo he so luong ===========";
-							XuatDanhSachNhanVien(l); 
-							cout << "\n";
-							system("pause");
-							goto menu;
-							break;
-						}
-						default: {
-							system("cls");
-							cout << "Nhap lai !";
-							system("pause");
-							break;
-						}
-						}
-					}
-					TroLai();
-				}
+				ThemNhanVien(l, luuluachon);
+				cout << "\n\n\t\t\t=========== Da them thanh cong =========== ";
+				cout << "\n Danh sach sau khi them la: \n";
+				XuatDanhSachNhanVien(l);
+				system("pause");
+				goto menu;
+				system("cls");
 				break;
+			
+			TroLai();
 			}
 			case 4:
 			{
@@ -952,7 +1228,6 @@ void menu() {
 			}
 			case 5:
 			{
-
 				TimKiemNhanVien(l);
 				system("pause");
 				break;
